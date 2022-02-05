@@ -1,0 +1,17 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
+        with:
+          heroku_api_key: cad7737c-687c-4913-bde8-916f6e9d9954
+          heroku_app_name: pomodee-server #Must be unique in Heroku
+          heroku_email: mintetemple@gmail.com
