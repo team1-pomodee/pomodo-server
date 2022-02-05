@@ -1,12 +1,11 @@
 const express = require('express');
-const res = require('express/lib/response');
 const app = express();
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server, {
   cors: {
-   origin: "https://61fed348cab9008200f87d7e--awesome-wiles-e205b3.netlify.app/",
+   origin: "https://pomododee.netlify.app/",
     methods: ["GET", "POST"]
 }});
 
