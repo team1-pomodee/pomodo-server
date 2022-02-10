@@ -1,6 +1,10 @@
 const express = require('express');
 const app = express();
 
+const server = app.listen(process.env.PORT || 4000, () => {
+  console.log('listening on *:4000');
+});
+
 // SOCKET.IO starts
 // Will work on this part later on
 const { Server } = require('socket.io');
@@ -28,7 +32,3 @@ const handleSendSignal = (signal) => {
   io.emit('action', signal);
 };
 // SOCKET.IO ends
-
-app.listen(process.env.PORT || 4000, () => {
-  console.log('listening on *:4000');
-});
