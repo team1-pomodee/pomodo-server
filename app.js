@@ -10,6 +10,8 @@ import 'express-async-errors';
 // database
 import connectDB from './db/connect.js';
 
+// router
+import authRouter from './routes/authRoutes.js';
 
 // middleware
 import notFoundMiddleware from './middleware/not-found.js';
@@ -17,6 +19,11 @@ import errorHandlerMiddleware from './middleware/error-handler.js';
 
 app.use(cors())
 app.use(express.json());
+
+app.get('/', (req, res) => {
+  res.send('Welcome to homepage')
+})
+app.use('/api/v1/auth', authRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
