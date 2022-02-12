@@ -6,14 +6,16 @@ JWT_LIFETIME=30d.
 
 
 ## Authentication. 
-  localhost:5000/api/v1/auth/register - POST. 
+  localhost:5000/api/v1/auth/register - POST.   
+  
    {. 
       "username": "user1",  
       "email": "user1@email.com",  
       "password": "123456". 
   }. 
 
-  localhost:5000/api/v1/auth/login - POST. 
+  localhost:5000/api/v1/auth/login - POST.  
+  
   {. 
       "email": "user1@email.com",  
       "password": "1234356". 
