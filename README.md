@@ -12,15 +12,15 @@ please use import or it will not work. Ex: const express = require('express') ->
 ## Authentication. 
   localhost:5000/api/v1/auth/register - POST.   
   
-   {. 
+   {
       "username": "user1",  
       "email": "user1@email.com",  
-      "password": "123456". 
+      "password": "123456"
   }. 
 
   localhost:5000/api/v1/auth/login - POST.  
   
-  {. 
+  {
       "email": "user1@email.com",  
-      "password": "1234356". 
+      "password": "1234356" 
   }. 
