@@ -1,4 +1,6 @@
 # pomodo-server. 
+create .env file and copy then paste the following information:    
+
 PORT=5000.  
 MONGO_URL=mongodb+srv://wing:123ABC@pomodee.70xv2.mongodb.net/myFirstDatabase?retryWrites=true&w=majority. 
 JWT_SECRET=team-1. 
