@@ -14,7 +14,33 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  res.send('Login');
+  const { email, password } = req.body
+  console.log("login")
+  console.log(email, password)
+
+  if (!email || !password) {
+    throw new Error('Please provide email and password.')
+  }
+
+  const user = await User.findOne({email}).select('+password')
+  console.log(user)
+
+  if (!user) {
+    throw new Error('You are trying to login with invalid credentials.')
+  }
+
+  const isPasswordCorrect = await user.comparePasswords(password)
+
+  console.log(isPasswordCorrect)
+  if (!isPasswordCorrect) {
+    throw new Error('You are trying to login with invalid credentials.')
+  }
+
+  user.password = undefined
+  const token = user.createJWT()
+  console.log(user, token) 
+  res.status(StatusCodes.OK).json({user, token})
+
 };
 const updateUser = async (req, res) => {
   res.send('Update User');
