@@ -22,5 +22,5 @@ please use import or it will not work. Ex: const express = require('express') ->
   
   {
       "email": "user1@email.com",  
-      "password": "1234356" 
+      "password": "123456" 
   }. 
