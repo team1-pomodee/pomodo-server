@@ -6,7 +6,7 @@ const { Server } = require("socket.io");
 const io = new Server(server, {
   transports : ['websocket'],
   cors: {
-   origin: "https://pomododee.netlify.app/",
+   origin: process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : "https://pomododee.netlify.app/",
     methods: ["GET", "POST"]
 }});
 
