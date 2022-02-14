@@ -55,7 +55,14 @@ start();
 
 
 io.on('connection', (socket) => {
+  // destroy room if all users have left the room the room for more than 30mins
+  // joins the room using room name
+  // get room count and user's information from the db, receive user's ID from client
   console.log('a user connected');
+  socket.on("private message", (anotherSocketId, msg) => {
+    socket.to(anotherSocketId).emit("private message", socket.id, msg);
+  });
+
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
