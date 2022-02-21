@@ -137,7 +137,7 @@ const handleSendSignal = (signal) => {
 
 const start = async () => {
     try {
-        await connectDB(process.env.MONGO_URL);
+        // await connectDB(process.env.MONGO_URL);
         server.listen(4000, () => {
           console.log(`Server is listening to port ${port}`);
         }); 
