@@ -5,6 +5,7 @@ PORT=5000.
 MONGO_URL=mongodb+srv://wing:123ABC@pomodee.70xv2.mongodb.net/myFirstDatabase?retryWrites=true&w=majority. 
 JWT_SECRET=team-1.   
 JWT_LIFETIME=30d. 
+NODE_ENV=development
 
 ## Note
 please use import or it will not work. Ex: const express = require('express') -> import express from 'express'

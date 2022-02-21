@@ -1,10 +1,10 @@
+import express from 'express';
 const app = express();
-const http = require('http');
+import * as http from 'http';
 const server = http.createServer(app);
-const { Server } = require("socket.io");
+import { Server } from "socket.io";
 
 import cors from 'cors'
-import express from 'express';
 
 import dotenv from 'dotenv';
 dotenv.config();
@@ -16,63 +16,135 @@ import connectDB from './db/connect.js';
 
 // router
 import authRouter from './routes/authRoutes.js';
+import requestRouter from './routes/requestRouter.js';
+import friendRouter from './routes/friendRoutes.js';
 
 // middleware
 import notFoundMiddleware from './middleware/not-found.js';
 import errorHandlerMiddleware from './middleware/error-handler.js';
 
 
-const io = new Server(server, {
-  transports : ['websocket'],
-  cors: {
-   origin: process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : "https://pomododee.netlify.app/",
-    methods: ["GET", "POST"]
-}});
-
-
 app.use(cors())
 app.use(express.json());
+
+app.use(function (req, res, next) {
+
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+
+    next();
+});
+
+const port = process.env.PORT || 5000;
+
+const io = new Server(server, {
+  cors: {
+   origin: '*',
+    methods: ['GET, POST, OPTIONS, PUT, PATCH, DELETE'],
+
+}});
+
+let users = []
+let rooms = {}
 
 app.get('/', (req, res) => {
   res.send('Welcome to homepage')
 })
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/request', requestRouter);
+app.use('/api/v1/friend', friendRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 
-const port = process.env.PORT || 5000;
+
+io.on('connection', (socket) => {
+
+  //what happens when a user refresh and looses their room name?
+  //what happens when a user disconnects
+  //how do users join room
+  
+  console.log('a user connected');
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+   });
+
+  socket.on('action', (msg) => {
+    console.log(msg)
+    handleSendSignal(msg)
+  });
+
+  socket.on('join room', (user) => {
+    if (user.roomName) {
+      socket.join(user.roomName);
+      const userDetails = {
+        ...user,
+        id: socket.id,
+        roomName: user.roomName,
+      }
+      
+      rooms[user.roomName] = { room: user.roomName};
+      users.push(userDetails)
+      socket.emit("new user", users)  
+    }
+
+    let interval
+    let count = 0;
+    let cycles = 0;
+
+    socket.on('timer', (control) => { 
+      if (control.action === "START") {
+        interval = setInterval(() => { 
+          rooms[user.roomName].count = rooms[user.roomName].count + 1;
+          io.to(control.roomName).emit("timer", {count, cycles})
+        }, 1000)
+      }
+
+      if (control.action === "STOP") {
+        clearInterval(interval);
+        rooms[user.roomName].count = 0;
+         io.to(control.roomName).emit("timer", {count: 0, cycles: 0})
+      }
+
+      if (control.action === "PAUSE") {
+        clearInterval(interval);      
+         io.to(control.roomName).emit("timer", {count: rooms[user.roomName].count, cycles: 0})
+      }
+      
+      if (control.action === "RESET") {
+        clearInterval(interval);
+        io.to(control.roomName).emit("timer", {count: 0, cycles: 0})
+      }
+      
+    })
+  });
+
+  
+
+  // socket.on('join room', (room) => {
+   
+  // });
+});
+
+const handleSendSignal = (signal) => {
+  io.emit('action', signal);
+}
+
+
+
 
 const start = async () => {
     try {
         await connectDB(process.env.MONGO_URL);
-        app.listen(port, console.log(`Server is listening to port ${port}`));
+        server.listen(4000, () => {
+          console.log(`Server is listening to port ${port}`);
+        }); 
+
     } catch (error) {
         console.log(error);
     }
 };
 start();
 
-
-io.on('connection', (socket) => {
-  // destroy room if all users have left the room the room for more than 30mins
-  // joins the room using room name
-  // get room count and user's information from the db, receive user's ID from client
-  console.log('a user connected');
-  socket.on("private message", (anotherSocketId, msg) => {
-    socket.to(anotherSocketId).emit("private message", socket.id, msg);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
-  });
-
-  socket.on('action', (msg) => {
-    console.log(msg);
-    handleSendSignal(msg);
-  });
-});
-
-const handleSendSignal = (signal) => {
-  io.emit('action', signal);
-};

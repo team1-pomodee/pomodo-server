@@ -1,5 +1,6 @@
 import User from '../models/User.js';
 import { StatusCodes } from 'http-status-codes';
+import bcrypt from 'bcryptjs';
 
 const register = async (req, res) => {
   const { username, email, password } = req.body;
@@ -7,6 +8,10 @@ const register = async (req, res) => {
   if (!username || !email || !password) {
     throw new Error("Please provide username, email and password.")
   }
+  
+  const salt = await bcrypt.genSalt(10)
+  password = await bcrypt.hash(password, salt )
+  
   const user = await User.create({username, email, password});
   const token = user.createJWT();
 
@@ -15,15 +20,12 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body
-  console.log("login")
-  console.log(email, password)
 
   if (!email || !password) {
     throw new Error('Please provide email and password.')
   }
 
   const user = await User.findOne({email}).select('+password')
-  console.log(user)
 
   if (!user) {
     throw new Error('You are trying to login with invalid credentials.')
@@ -31,14 +33,13 @@ const login = async (req, res) => {
 
   const isPasswordCorrect = await user.comparePasswords(password)
 
-  console.log(isPasswordCorrect)
   if (!isPasswordCorrect) {
     throw new Error('You are trying to login with invalid credentials.')
   }
 
   user.password = undefined
   const token = user.createJWT()
-  console.log(user, token) 
+
   res.status(StatusCodes.OK).json({user, token})
 
 };

@@ -17,6 +17,7 @@ const UserSchema = new mongoose.Schema({
       message: 'Please provide a valid email.',
     },
   },
+  friends: { type: Array },
   password: {
     type: String,
     required: [true, 'Please provide a password.'],
@@ -26,10 +27,6 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
-UserSchema.pre('save', async function() {
-  const salt = await bcrypt.genSalt(10)
-  this.password = await bcrypt.hash(this.password, salt )
-})
 
 UserSchema.methods.createJWT = function() {
   return jwt.sign({userId: this._id}, 'team1-secret', {expiresIn: '30d'})
