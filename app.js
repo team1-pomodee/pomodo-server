@@ -27,15 +27,6 @@ import errorHandlerMiddleware from './middleware/error-handler.js';
 app.use(cors())
 app.use(express.json());
 
-app.use(function (req, res, next) {
-
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-    res.setHeader('Access-Control-Allow-Credentials', true);
-
-    next();
-});
 
 const port = process.env.PORT || 5000;
 
@@ -138,7 +129,7 @@ const handleSendSignal = (signal) => {
 const start = async () => {
     try {
         // await connectDB(process.env.MONGO_URL);
-        server.listen(4000, () => {
+        server.listen(port, () => {
           console.log(`Server is listening to port ${port}`);
         }); 
 
