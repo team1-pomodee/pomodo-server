@@ -22,7 +22,7 @@ const register = async (req, res) => {
             const user = await User.create({username, email, password: pass});
             res.status(StatusCodes.CREATED).send({ user: { username: user.username, email: user.email} });
           } else {
-            res.status(409).json({message: "User already exist"})
+            res.status(200).json({message: "User already exist"})
           }
         }
     })
