@@ -40,26 +40,30 @@ const login = async (req, res) => {
     throw new Error('Please provide email and password.')
   }
 
-  const user = await User.findOne({ email }).select('+password')
-  
 
+  try {
+    const user = await User.findOne({ email }).select('+password')
+    
+    if (!user) {
+      throw new Error('You are trying to login with invalid credentials.')
+    }
 
-  if (!user) {
-    throw new Error('You are trying to login with invalid credentials.')
+    const isPasswordCorrect = await user.comparePasswords(password)
+
+    if (!isPasswordCorrect) {
+      throw new Error('You are trying to login with invalid credentials.')
+    }
+
+    user.password = undefined
+    const token = user.createJWT()
+
+    res.status(StatusCodes.OK).json({user, token})
+  } catch (error) {
+    throw new Error(error)
   }
-
-  const isPasswordCorrect = await user.comparePasswords(password)
-
-  if (!isPasswordCorrect) {
-    throw new Error('You are trying to login with invalid credentials.')
-  }
-
-  user.password = undefined
-  const token = user.createJWT()
-
-  res.status(StatusCodes.OK).json({user, token})
 
 };
+
 const updateUser = async (req, res) => {
   res.send('Update User');
 };
