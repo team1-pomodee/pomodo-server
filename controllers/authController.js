@@ -8,14 +8,29 @@ const register = async (req, res) => {
   if (!username || !email || !password) {
     throw new Error("Please provide username, email and password.")
   }
-  
-  const salt = await bcrypt.genSalt(10)
-  password = await bcrypt.hash(password, salt )
-  
-  const user = await User.create({username, email, password});
-  const token = user.createJWT();
 
-  res.status(StatusCodes.CREATED).json({ user: { username: user.username, email: user.email}, token });
+  const pass = await bcrypt.hash(password, 10);
+
+  try {  
+    User.find({ username, email })
+      .exec(async (error, result) => {
+        if (error) {
+            throw new Error(error)
+            
+        } else {
+          if (result.length === 0) {
+            const user = await User.create({username, email, password: pass});
+            res.status(StatusCodes.CREATED).send({ user: { username: user.username, email: user.email} });
+          } else {
+            res.status(409).json({message: "User already exist"})
+          }
+        }
+    })
+
+  } catch (error) {
+    throw new Error(error) 
+  }
+ 
 };
 
 const login = async (req, res) => {
@@ -25,7 +40,9 @@ const login = async (req, res) => {
     throw new Error('Please provide email and password.')
   }
 
-  const user = await User.findOne({email}).select('+password')
+  const user = await User.findOne({ email }).select('+password')
+  
+
 
   if (!user) {
     throw new Error('You are trying to login with invalid credentials.')

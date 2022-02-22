@@ -41,7 +41,7 @@ let users = []
 let rooms = {}
 
 app.get('/', (req, res) => {
-  res.send('Welcome to homepage')
+  res.send('Welcome to pomodee server')
 })
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/request', requestRouter);
@@ -112,11 +112,6 @@ io.on('connection', (socket) => {
     })
   });
 
-  
-
-  // socket.on('join room', (room) => {
-   
-  // });
 });
 
 const handleSendSignal = (signal) => {
@@ -124,15 +119,12 @@ const handleSendSignal = (signal) => {
 }
 
 
-
-
 const start = async () => {
     try {
-         await connectDB(process.env.MONGO_URL);
+        await connectDB(process.env.MONGO_URL);
         server.listen(port, () => {
           console.log(`Server is listening to port ${port}`);
         }); 
-
     } catch (error) {
         console.log(error);
     }
