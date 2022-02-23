@@ -59,6 +59,8 @@ io.on('connection', (socket) => {
   
   console.log('a user connected');
   socket.on('disconnect', () => {
+    const onlineUsers = users.filter((data) => data.id !== socket.id)
+    users = onlineUsers;
     console.log('user disconnected');
    });
 
@@ -75,10 +77,15 @@ io.on('connection', (socket) => {
         id: socket.id,
         roomName: user.roomName,
       }
-      
-      rooms[user.roomName] = { room: user.roomName};
-      users.push(userDetails)
-      socket.emit("new user", users)  
+
+      const isUserExist = users.find((data) => data.id === socket.id)
+
+      if (!isUserExist) {
+        rooms[user.roomName] = { room: user.roomName};
+        users.push(userDetails)
+        socket.emit("new user", users)  
+      }
+     
     }
 
     let interval
