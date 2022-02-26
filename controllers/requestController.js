@@ -14,6 +14,9 @@ const createRequest = async (req, res) => {
         if (error) {
             throw new Error(error)
         } else {
+
+            if (result.length > 0) res.status(StatusCodes.CREATED).json({ message: 'Request was created successfully', data: result });
+            
                 const request = new Request({ sendersEmail, sendersId, roomName, userId, requestType });
     
                 request.save((error) => {
