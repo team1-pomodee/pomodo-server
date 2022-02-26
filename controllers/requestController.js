@@ -3,21 +3,21 @@ import { StatusCodes } from 'http-status-codes';
 import User from '../models/User.js';
 
 const createRequest = async (req, res) => {
-  const { sendersEmail, sendersId, roomName, userId, requestType } = req.body;
+  const { sendersEmail, sendersId, roomName, username, userId, requestType } = req.body;
   
 
-  if (!sendersEmail || !sendersId || !userId || !requestType) {
-    throw new Error("Please provide sendersEmail, sendersId, userId, requestType.")
+  if (!sendersEmail || !sendersId || !userId || !requestType || !username) {
+    throw new Error("Please provide sendersEmail, sendersId, userId, username, requestType.")
   }
     
-       Request.find({sendersEmail, sendersId, sendersEmail, requestType }).exec((error, result) => {
+       Request.find({sendersEmail, sendersId, sendersEmail, username, requestType }).exec((error, result) => {
         if (error) {
             throw new Error(error)
         } else {
 
             if (result.length > 0) res.status(StatusCodes.CREATED).json({ message: 'Request was created successfully', data: result });
             
-                const request = new Request({ sendersEmail, sendersId, roomName, userId, requestType, createdAt: new Date.now() });
+                const request = new Request({ sendersEmail, sendersId, roomName, userId, username, requestType, createdAt: new Date.now() });
     
                 request.save((error) => {
                     if (error) {

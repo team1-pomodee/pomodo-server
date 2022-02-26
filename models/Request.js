@@ -17,14 +17,18 @@ const RequestSchema = new mongoose.Schema({
   roomName: {
     type: String,
     required: false,
-   },
-    userId: {
+  },
+  userId: {
         type: String,
-        required: [true, 'Please provide a senders id.'],
-    },
-    requestType: {
-        type: String,
-        required: [true, 'Please provide a request type.'],
+        required: [true, 'Please provide a user id.'],
+  },
+  username: {
+      type: String,
+      required: [true, 'Please provide a username.'],
+  },
+  requestType: {
+      type: String,
+      required: [true, 'Please provide a request type.'],
   },
   createdAt: {
     type: Date,
