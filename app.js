@@ -78,13 +78,14 @@ io.on('connection', (socket) => {
         roomName: user.roomName,
       }
 
-      const isUserExist = users.find((data) => data.id === socket.id)
+      const isUserExist = users.find((data) => data.username === user.username)
 
       if (!isUserExist) {
         rooms[user.roomName] = { room: user.roomName};
         users.push(userDetails)
         socket.emit("new user", users)  
-      }
+      } 
+      
      
     }
 
