@@ -25,7 +25,11 @@ const RequestSchema = new mongoose.Schema({
     requestType: {
         type: String,
         required: [true, 'Please provide a request type.'],
-    }
+  },
+  createdAt: {
+    type: Date,
+    required: [true, 'Please provide a createdAt date'],
+  }
 });
 
 export default mongoose.model('Request', RequestSchema);
