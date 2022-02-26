@@ -9,15 +9,25 @@ const createRequest = async (req, res) => {
   if (!sendersEmail || !sendersId || !userId || !requestType) {
     throw new Error("Please provide sendersEmail, sendersId, userId, requestType.")
   }
-    const request = new Request({ sendersEmail, sendersId, roomName, userId, requestType });
     
-    request.save((error) => {
+       Request.find({sendersEmail, sendersId, sendersEmail, requestType }).exec((error, result) => {
         if (error) {
             throw new Error(error)
         } else {
-            res.status(StatusCodes.CREATED).json({ message: 'Request was created successfully' , data: request});
+                const request = new Request({ sendersEmail, sendersId, roomName, userId, requestType });
+    
+                request.save((error) => {
+                    if (error) {
+                        throw new Error(error)
+                    } else {
+                        res.status(StatusCodes.CREATED).json({ message: 'Request was created successfully' , data: request});
+                    }
+                })
         }
-    })
+       })
+    
+    
+  
 
 };
 

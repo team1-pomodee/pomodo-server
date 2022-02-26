@@ -34,7 +34,6 @@ const getFriendsByUserId = async (req, res) => {
                     res.status(StatusCodes.CREATED).json({ message: 'Request was successful' , data: data, count: data.length});
                 }
             })
-            // res.status(StatusCodes.CREATED).json({ message: 'Request was successful' , data: result[0].friends, count: result.length});
         }
     })
 
