@@ -75,12 +75,12 @@ const updateRequest = async (req, res) => {
 
 const deleteRequest = async (req, res) => {
     const { requestID } = req.body
-
+    
+    console.log(req.body)
   
     try {
-        let report = await Request.findById(requestID)
-        await report.remove()
-     
+         await Request.findOneAndDelete(requestID)
+    
         res.status(StatusCodes.CREATED).json({ message: 'Request was deleted successfully'});
 
     } catch (error) {
