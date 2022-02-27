@@ -54,12 +54,11 @@ const updateRequest = async (req, res) => {
     try {
         let me = await User.findById(userId);
         let friend = await User.findById(friendId);
-        let report = await Request.findById(requestID)
+        let report = await Request.findByIdAndDelete(requestID)
 
         friend.friends = friend.friends ? friend.friends.concat(me.id) : [me.id]
         me.friends = me.friends ?  me.friends.concat(friend.id) : [friend.id]
-        
-        await report.remove()
+
         me.save()
         friend.save()
         
