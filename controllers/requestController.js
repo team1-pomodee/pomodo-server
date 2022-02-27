@@ -74,7 +74,8 @@ const updateRequest = async (req, res) => {
 
 
 const deleteRequest = async (req, res) => {
-    const  { requestID } = req.params
+    const { requestID } = req.body
+
   
     try {
         let report = await Request.findById(requestID)
