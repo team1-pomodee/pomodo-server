@@ -5,7 +5,6 @@ import User from '../models/User.js';
 const createRequest = async (req, res) => {
   const { sendersEmail, sendersId, roomName, username, userId, requestType } = req.body;
   
-
   if (!sendersEmail || !sendersId || !userId || !requestType || !username) {
     throw new Error("Please provide sendersEmail, sendersId, userId, username, requestType.")
   }
@@ -17,7 +16,7 @@ const createRequest = async (req, res) => {
 
             if (result.length > 0) res.status(StatusCodes.CREATED).json({ message: 'Request was created successfully', data: result });
             
-                const request = new Request({ sendersEmail, sendersId, roomName, userId, username, requestType, createdAt: new Date.now() });
+                const request = new Request({ sendersEmail, sendersId, roomName, userId, username, requestType, createdAt: new Date() });
     
                 request.save((error) => {
                     if (error) {
