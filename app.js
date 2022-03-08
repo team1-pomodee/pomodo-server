@@ -36,9 +36,8 @@ const io = new Server(server, {
     methods: ['GET, POST, OPTIONS, PUT, PATCH, DELETE'],
 
 }});
-
-let users = []
-let rooms = {}
+ const rooms = {}
+ const usersList = {}
 
 app.get('/', (req, res) => {
   res.send('Welcome to pomodee server')
@@ -56,37 +55,51 @@ io.on('connection', (socket) => {
   //what happens when a user refresh and looses their room name?
   //what happens when a user disconnects
   //how do users join room
+
   
   console.log('a user connected');
+
   socket.on('disconnect', () => {
+    const room = usersList[socket.id] 
+    const users = rooms[room] || []
+
     const onlineUsers = users.filter((data) => data.id !== socket.id)
-    users = onlineUsers;
-    console.log('user disconnected');
-   });
+    if (onlineUsers.length > 0) {
+      rooms[room] = onlineUsers;
+      io.to(onlineUsers[0].roomName).emit("new user", onlineUsers)  
+    }
+    console.log('disconnected')
+  
+  });
 
   socket.on('action', (msg) => {
     console.log(msg)
     handleSendSignal(msg)
   });
 
+
   socket.on('join room', (user) => {
+    // console.log(user)
     if (user.roomName) {
       socket.join(user.roomName);
       const userDetails = {
         ...user,
         id: socket.id,
-        roomName: user.roomName,
       }
 
+        rooms[user.roomName] =  rooms[user.roomName] || []
+      const users = rooms[user.roomName]
       const isUserExist = users.find((data) => data.username === user.username)
 
-      if (!isUserExist) {
-        rooms[user.roomName] = { room: user.roomName};
-        users.push(userDetails)
-        socket.emit("new user", users)  
-      } 
       
-     
+      if (!isUserExist) {
+        users.push(userDetails)
+      }
+      
+      socket.emit("new user", users)
+      usersList[socket.id] = user.roomName
+      
+      console.log(`${user.username} has joined the ${user.roomName} room`, users.length)
     }
 
     let interval

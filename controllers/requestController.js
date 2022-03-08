@@ -3,34 +3,30 @@ import { StatusCodes } from 'http-status-codes';
 import User from '../models/User.js';
 
 const createRequest = async (req, res) => {
-  const { sendersEmail, sendersId, roomName, username, userId, requestType } = req.body;
+    const { sendersEmail, sendersId, roomName, username, userId, requestType } = req.body;
   
-  if (!sendersEmail || !sendersId || !userId || !requestType || !username) {
-    throw new Error("Please provide sendersEmail, sendersId, userId, username, requestType.")
-  }
+    if (!sendersEmail || !sendersId || !userId || !requestType || !username) {
+        throw new Error("Please provide sendersEmail, sendersId, userId, username, requestType.")
+    }
     
-       Request.find({sendersEmail, sendersId, sendersEmail, username, requestType }).exec((error, result) => {
-        if (error) {
-            throw new Error(error)
-        } else {
+    Request.find({sendersEmail, sendersId, sendersEmail, username, requestType }).exec((error, result) => {
+    if (error) {
+        throw new Error(error)
+    } else {
 
-            if (result.length > 0) res.status(StatusCodes.CREATED).json({ message: 'Request was created successfully', data: result });
-            
-                const request = new Request({ sendersEmail, sendersId, roomName, userId, username, requestType, createdAt: new Date() });
-    
-                request.save((error) => {
-                    if (error) {
-                        throw new Error(error)
-                    } else {
-                        res.status(StatusCodes.CREATED).json({ message: 'Request was created successfully' , data: request});
-                    }
-                })
-        }
-       })
-    
-    
-  
+        if (result.length > 0) res.status(StatusCodes.CREATED).json({ message: 'Request was created successfully', data: result });
+        
+            const request = new Request({ sendersEmail, sendersId, roomName, userId, username, requestType, createdAt: new Date() });
 
+            request.save((error) => {
+                if (error) {
+                    throw new Error(error)
+                } else {
+                    res.status(StatusCodes.CREATED).json({ message: 'Request was created successfully' , data: request});
+                }
+            })
+    }
+    })
 };
 
 const getRequestByUserId = async (req, res) => {
@@ -54,7 +50,7 @@ const updateRequest = async (req, res) => {
     try {
         let me = await User.findById(userId);
         let friend = await User.findById(friendId);
-        let report = await Request.findByIdAndDelete(requestID)
+        await Request.findByIdAndDelete(requestID)
 
         friend.friends = friend.friends ? friend.friends.concat(me.id) : [me.id]
         me.friends = me.friends ?  me.friends.concat(friend.id) : [friend.id]
