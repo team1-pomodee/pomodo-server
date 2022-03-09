@@ -21,7 +21,6 @@ const register = async (req, res) => {
             username,
             email,
             password: pass,
-            cycles: 0,
           })
           res.status(StatusCodes.CREATED).send({
             user: {

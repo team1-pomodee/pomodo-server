@@ -23,7 +23,7 @@ const UserSchema = new mongoose.Schema({
     required: [true, "Please provide a password."],
     select: false,
   },
-  cycles: { type: Number },
+  cycles: { type: Number, default: 0 },
 })
 
 UserSchema.methods.createJWT = function () {
