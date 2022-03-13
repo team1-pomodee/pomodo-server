@@ -74,4 +74,19 @@ const updateUser = async (req, res) => {
   // res.send('Update User');
 };
 
-export { register, login, updateUser };
+const addCycle = async (req, res) => {
+  const { email } = req.body;
+  User.findOne({ email: email })
+    .exec()
+    .then((result) => {
+      result.update({ $push: { cycleDetail: "new cycle" } }).exec();
+    })
+    .then((result) => {
+      res.send("Cycle added");
+    })
+    .catch((error) => {
+      res.status(500).json(error);
+    });
+};
+
+export { register, login, updateUser, addCycle };
