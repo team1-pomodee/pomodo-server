@@ -1,7 +1,7 @@
-import mongoose from "mongoose"
-import validator from "validator"
-import bcrypt from "bcryptjs"
-import jwt from "jsonwebtoken"
+import mongoose from "mongoose";
+import validator from "validator";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 const UserSchema = new mongoose.Schema({
   username: {
@@ -24,15 +24,16 @@ const UserSchema = new mongoose.Schema({
     select: false,
   },
   cycles: { type: Number, default: 0 },
-})
+  cycleDetail: { type: Array, default: [] },
+});
 
 UserSchema.methods.createJWT = function () {
-  return jwt.sign({ userId: this._id }, "team1-secret", { expiresIn: "30d" })
-}
+  return jwt.sign({ userId: this._id }, "team1-secret", { expiresIn: "30d" });
+};
 
 UserSchema.methods.comparePasswords = async function (enteredPassword) {
-  const isMatched = await bcrypt.compare(enteredPassword, this.password)
-  return isMatched
-}
+  const isMatched = await bcrypt.compare(enteredPassword, this.password);
+  return isMatched;
+};
 
-export default mongoose.model("User", UserSchema)
+export default mongoose.model("User", UserSchema);
