@@ -74,4 +74,11 @@ const updateUser = async (req, res) => {
   // res.send('Update User');
 };
 
-export { register, login, updateUser };
+const addCycle = async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email: email });
+  const updated = await user.updateOne({ $push: { cycleDetail: "new cycle" } });
+  res.send(`${updated}`);
+};
+
+export { register, login, updateUser, addCycle };
