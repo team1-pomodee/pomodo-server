@@ -76,9 +76,17 @@ const updateUser = async (req, res) => {
 
 const addCycle = async (req, res) => {
   const { email } = req.body;
-  const user = await User.findOne({ email: email });
-  const updated = await user.updateOne({ $push: { cycleDetail: "new cycle" } });
-  res.send(`${updated}`);
+  User.findOne({ email: email })
+    .exec()
+    .then((result) => {
+      result.update({ $push: { cycleDetail: "new cycle" } }).exec();
+    })
+    .then((result) => {
+      res.send("Cycle added");
+    })
+    .catch((error) => {
+      res.status(500).json(error);
+    });
 };
 
 export { register, login, updateUser, addCycle };
