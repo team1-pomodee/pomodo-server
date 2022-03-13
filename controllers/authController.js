@@ -75,11 +75,11 @@ const updateUser = async (req, res) => {
 };
 
 const addCycle = async (req, res) => {
-  const { email } = req.body;
+  const { email, cycleData } = req.body;
   User.findOne({ email: email })
     .exec()
     .then((result) => {
-      result.update({ $push: { cycleDetail: "new cycle" } }).exec();
+      result.update({ $push: { cycleDetail: cycleData } }).exec();
     })
     .then((result) => {
       res.send("Cycle added");
