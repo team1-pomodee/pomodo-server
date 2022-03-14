@@ -89,4 +89,22 @@ const addCycle = async (req, res) => {
     });
 };
 
-export { register, login, updateUser, addCycle };
+
+const updateAvatar = async (req, res) => {
+  const { username, avatar } = req.body;
+  User.findOne({ username: username })
+    .exec()
+    .then((result) => {
+      result.update({ avatar: avatar }).exec();
+    })
+    .then((result) => {
+      res.send({message: 'UPDATE_SUCCESSFUL', data: result});
+    })
+    .catch((error) => {
+       throw new Error(error);
+    });
+};
+
+
+
+export { register, updateAvatar, login, updateUser, addCycle };

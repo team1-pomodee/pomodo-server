@@ -24,6 +24,7 @@ const UserSchema = new mongoose.Schema({
     select: false,
   },
   cycles: { type: Number, default: 0 },
+  avatar: { type: Number },
   cycleDetail: { type: Array, default: [] },
 });
 
