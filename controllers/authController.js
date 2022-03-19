@@ -119,7 +119,9 @@ const hallOfFame = async (req, res) => {
     })
 
     res.send(userMap)
-  }).sort({ cycles: 1 })
+  })
+    .select({ username: 1, cycles: 1 })
+    .sort({ cycles: 1 })
 }
 
 export { register, updateAvatar, login, updateUser, addCycle, hallOfFame }
