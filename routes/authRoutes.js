@@ -1,5 +1,5 @@
-import express from "express";
-const router = express.Router();
+import express from "express"
+const router = express.Router()
 
 import {
   register,
@@ -7,12 +7,14 @@ import {
   updateUser,
   addCycle,
   updateAvatar,
-} from "../controllers/authController.js";
+  hallOfFame,
+} from "../controllers/authController.js"
 
-router.route("/register").post(register);
-router.route("/login").post(login);
-router.route("/updateUser").patch(updateUser);
-router.route("/updateAvatar").patch(updateAvatar);
-router.route("/addCycle").patch(addCycle);
+router.route("/register").post(register)
+router.route("/login").post(login)
+router.route("/updateUser").patch(updateUser)
+router.route("/updateAvatar").patch(updateAvatar)
+router.route("/addCycle").patch(addCycle)
+router.route("/hallOfFame").get(hallOfFame)
 
-export default router;
+export default router

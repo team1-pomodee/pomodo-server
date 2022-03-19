@@ -110,4 +110,16 @@ const updateAvatar = async (req, res) => {
     })
 }
 
-export { register, updateAvatar, login, updateUser, addCycle }
+const hallOfFame = async (req, res) => {
+  User.find({}, function (err, users) {
+    var userMap = {}
+
+    users.forEach(function (user) {
+      userMap[user._id] = user
+    })
+
+    res.send(userMap)
+  }).sort({ cycles: 1 })
+}
+
+export { register, updateAvatar, login, updateUser, addCycle, hallOfFame }
