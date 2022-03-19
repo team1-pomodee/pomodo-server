@@ -122,6 +122,7 @@ const hallOfFame = async (req, res) => {
   })
     .select({ username: 1, cycles: 1 })
     .sort({ cycles: 1 })
+    .limit(10)
 }
 
 export { register, updateAvatar, login, updateUser, addCycle, hallOfFame }
