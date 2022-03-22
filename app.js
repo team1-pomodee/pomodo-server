@@ -24,6 +24,7 @@ import notFoundMiddleware from "./middleware/not-found.js"
 import errorHandlerMiddleware from "./middleware/error-handler.js"
 
 app.use(cors())
+app.options('*', cors())
 app.use(express.json())
 
 const port = process.env.PORT || 3000
