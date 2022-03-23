@@ -67,13 +67,15 @@ const login = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const { username, cycles } = req.body
+
   User.findOne({ username: username })
     .exec()
     .then((result) => {
-      result.update({ cycles: cycles }).exec()
+      let previousCycle = result.cycles + cycles
+      result.update({ cycles: previousCycle }).exec()
     })
     .then((result) => {
-      res.send("Update User")
+      res.send(result.cycles)
     })
     .catch((error) => {
       console.error(error)
