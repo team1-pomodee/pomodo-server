@@ -39,6 +39,21 @@ const getFriendsByUserId = async (req, res) => {
 
 };
 
+
+const getSingleUser = async (req, res) => {
+    const { userId } = req.params;
+
+    User.findById({ _id: userId }).exec((error, result) => {
+        if (error) {
+            throw new Error(error)
+        } else {
+            res.status(StatusCodes.CREATED).json({ message: 'Request was successful' , data: result});
+        }
+    })
+
+};
+
+
 const unFriendUsers = async (req, res) => {
     const  {userId, friendId } = req.body
   
@@ -66,4 +81,4 @@ const unFriendUsers = async (req, res) => {
 
 
 
-export { searchUsers,getFriendsByUserId, unFriendUsers };
+export { searchUsers,getFriendsByUserId, unFriendUsers, getSingleUser };

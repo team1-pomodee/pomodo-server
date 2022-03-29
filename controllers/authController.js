@@ -66,12 +66,12 @@ const login = async (req, res) => {
 }
 
 const updateUser = async (req, res) => {
-  const { username, cycles } = req.body
+  const { username } = req.body
 
   User.findOne({ username: username })
     .exec()
     .then((result) => {
-      let previousCycle = result.cycles + cycles
+      let previousCycle = result.cycles + 1
       result.update({ cycles: previousCycle }).exec()
     })
     .then((result) => {
