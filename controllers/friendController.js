@@ -1,5 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 import User from '../models/User.js';
+import { ObjectId } from 'mongodb';
 
 const searchUsers = async (req, res) => {
     const { user } = req.query;
@@ -43,8 +44,9 @@ const getFriendsByUserId = async (req, res) => {
 const getSingleUser = async (req, res) => {
     const { userId } = req.params;
 
-    User.findById({ _id: userId }).exec((error, result) => {
+    User.findOne({_id: ObjectId(userId)}).exec((error, result) => {
         if (error) {
+            console.log(error)
             throw new Error(error)
         } else {
             res.status(StatusCodes.CREATED).json({ message: 'Request was successful' , data: result});
