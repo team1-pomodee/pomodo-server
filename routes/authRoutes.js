@@ -12,9 +12,9 @@ import {
 
 router.route("/register").post(register)
 router.route("/login").post(login)
-router.route("/updateUser").patch(updateUser)
-router.route("/updateAvatar").patch(updateAvatar)
-router.route("/addCycle").patch(addCycle)
+router.route("/updateUser").put(updateUser)
+router.route("/updateAvatar").put(updateAvatar)
+router.route("/addCycle").put(addCycle)
 router.route("/hallOfFame").get(hallOfFame)
 
 export default router
