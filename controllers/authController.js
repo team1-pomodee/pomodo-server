@@ -139,7 +139,7 @@ const hallOfFame = async (req, res) => {
 
     res.send(userMap)
   })
-    .select({ username: 1, cycles: 1 })
+    .select({ username: 1, cycles: 1, avatar: 1 })
     .sort({ cycles: -1 })
     .limit(10)
 }
