@@ -73,13 +73,13 @@ const updateUser = async (req, res) => {
     .then((result) => {
       let previousCycle = result.cycles + 1
       result.update({ cycles: previousCycle }).exec()
-    })
-    .then((result) => {
-      res.send(result.cycles)
+    }).
+    then((result) => { 
+      res.status(StatusCodes.OK).json({  message: 'update cycle was successful', data: result })
     })
     .catch((error) => {
-      console.error(error)
-    })
+      throw new Error(error);
+});
 }
 
 const addCycle = async (req, res) => {

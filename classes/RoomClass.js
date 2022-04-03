@@ -3,38 +3,81 @@ export class Room  {
   onlineUsers = [];
   roomName = '';
   socket = null;
-
-  constructor(socket){
+  io = null
+  intervalID = null;
+  counter = 0;
+  breakDuration = 5000;
+  pomodoDuration = 25000;
+  duration = 25000
+  intervalDuration = 1000
+  cycle = 0;
+  isPlaying = false;
+  percent = 100;
+  deleteRoom;
+  
+  constructor(socket, io, deleteRoom){
     this.socket = socket;
+    this.io = io;
+    this.deleteRoom = deleteRoom;
   }
 
   play = () => { 
-    interval = setInterval(() => {
 
-      timer = timer + 1;
+    this.intervalID = setInterval(() => {
+      this.isPlaying = true;
+      if (this.counter === this.duration) {
+        this.duration = this.duration === this.pomodoDuration ? this.breakDuration : this.pomodoDuration;
+        this.counter = 0;
+        this.cycle = this.duration === this.pomodoDuration ? this.cycle + 1 : this.cycle;
 
-    }, timer === duration ? breakDuration : duration);
+        this.percent = Math.floor(this.counter / this.duration * 100);
+
+        this.sendSignalsToAllUser('timer',  {isPlaying: this.isPlaying, onlineUsers:this.onlineUsers.length, cycle: this.cycle, percent: this.percent, time: this.counter / this.intervalDuration, duration: this.duration});
+        return
+      }
+
+      this.counter =  this.counter + this.intervalDuration;
+      this.percent = Math.floor(this.counter / this.duration * 100)
+      this.sendSignalsToAllUser('timer',  {isPlaying: this.isPlaying, onlineUsers: this.onlineUsers.length, cycle: this.cycle, percent: this.percent, time: this.counter / this.intervalDuration , duration: this.duration});
+
+    }, this.intervalDuration);
   }
 
   pause = () => {
-    clearInterval(interval);
-
+    this.isPlaying = false;
+    clearInterval(this.intervalID);
+    this.sendSignalsToAllUser('timer',  {isPlaying: this.isPlaying, onlineUsers: this.onlineUsers.length, cycle: this.cycle, percent: this.percent, time: this.counter / this.intervalDuration , duration: this.duration});
   }
 
   reset = () => { 
-    clearInterval(interval);
-    
+    this.pause()
+    this.isPlaying = false;
+     
+    this.intervalID = null;
+    this.counter = 0;
+    this.breakDuration = 5000;
+    this.pomodoDuration = 25000;
+    this.duration = 25000
+    this.intervalDuration = 1000
+    this.cycle = 0;
+    this.isPlaying = false;
+    this.percent = 0;
+
+    clearInterval(this.intervalID);
+    this.sendSignalsToAllUser('timer',  {isPlaying: this.isPlaying, onlineUsers:this.onlineUsers.length, cycle: this.cycle, percent: 100, time: this.counter / this.intervalDuration , duration: this.duration});
   }
 
-  closeRoom = () => { 
-    clearInterval(interval);
-    //distroy socket room
-  };
 
-  getOnlineUsers = () => { 
-    clearInterval(interval);
-    //distroy socket room
-    return this.onLineUsers;
+
+  closeRoom = async () => { 
+    // kick all users out of the room except the creator
+    
+    await this.sendSignalsToAllUser("new user", []);
+    
+    this.onlineUsers = []
+   
+    this.reset();
+    console.log(`${this.roomName} has been deleted`);
   };
 
 
@@ -43,76 +86,69 @@ export class Room  {
   }
 
   setAdmin = (user) => { 
-    const onlineUsers = users.map((data) => {
-      if (data.id === user.id) {
-        io.to(user.roomName).emit("control", data.hasControl ? false : true)
+    const onlineUsers = this.onlineUsers.map((data) => {
+      if (data.username === user.username && data.username !== this.roomName) {
         return { ...data, hasControl: data.hasControl ? false : true }
       } 
-    });
-    this.onlineUsers = onlineUsers;
-    io.to(this.roomName).emit("new user", onlineUsers)
-  }
 
+      return data;
+    });
+
+    this.onlineUsers = onlineUsers;
+    this.sendSignalsToAllUser("new user", this.onlineUsers)
+  }
 
   removeUser = (userSocketId) => {
 
     const remainingOnlineUsers = this.onlineUsers.filter((data) => data.id !== userSocketId)
-    if (onlineUsers.length > 0) {
+
+    if (remainingOnlineUsers.length > 0) {
       this.onlineUsers = remainingOnlineUsers
 
-      setTimeout(() => {    
-        // in case the user is still in the room
-        io.to(this.roomName).emit("new user", remainingOnlineUsers)
-      }, 2000)
-      
+  
+        this.io.to(this.roomName).emit("new user", remainingOnlineUsers)
+   
+
     }
   }
 
 
   setJoiningUsers = (user) => { 
-      const isUserExist = this.onlineUsers.find((data) => data.username === user.username)
+    const onlineUser = this.onlineUsers.find((data) => data.username === user.username)
 
-      if (!isUserExist) {
-        this.onlineUsers.push(user)
-      }
+    if (!onlineUser) {
+      this.onlineUsers.push(user)
+    } else {
+      const remainingOnlineUsers = this.onlineUsers.filter((data) => data.username !== user.username)
+      remainingOnlineUsers.push({ ...onlineUser, ...user })
+
+      this.onlineUsers = remainingOnlineUsers;
+    }
+
+    setTimeout(() => {
+      // in case the user list update is not reflected in the client
+      this.sendSignalsToAllUser("new user", this.onlineUsers);
+      this.sendSignalsToAllUser('timer',  {isPlaying: this.isPlaying, cycle: this.cycle, percent: this.percent, onlineUsers:this.onlineUsers.length, time: this.counter / this.intervalDuration , duration: this.duration});
+    }, 2000)
+     
   }
 
 
-  sendSignalsToAllUser = (signal) => { 
-    clearInterval(interval);
-    //distroy socket room
-     this.onLineUsers.map(() => {
-       io.to(this.roomName).emit("timer", {time: 0, users: this.onLineUsers})
-     })
+  sendSignalsToAllUser = async (signalName, data) => { 
+       this.io.to(this.roomName).emit(signalName, data)
   }
 
-  sendSignalsToOneUser = (signal) => { 
-    clearInterval(interval);
-    //distroy socket room
-     this.onLineUsers.map(data => {
-      if(data.id === signal.id){
-        io.to(this.roomName).emit("timer", {time: 0, users: this.onLineUsers})
+  sendSignalsToSingleUser = async (signalName, {data, username}) => { 
+    this.onlineUsers.forEach((user) => {
+      if (user.username === username) {
+        this.io.to(this.roomName).emit(signalName, data)
       }
     })
   }
 
-  getRoomName = (roomName) => {
-    return roomName;
+  getRoomName = () => {
+    return this.roomName;
   }
-
-  getOneOnlineUser = (signal) => { 
-    let user = {};
-    //distroy socket room
-    this.onLineUsers.map(data => {
-      if (data.username === signal.username) {
-        user = data;
-      }
-    });
-
-    return user;
-  }
-
- 
 
 }
 

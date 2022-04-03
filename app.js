@@ -22,7 +22,8 @@ import friendRouter from "./routes/friendRoutes.js"
 // middleware
 import notFoundMiddleware from "./middleware/not-found.js"
 import errorHandlerMiddleware from "./middleware/error-handler.js"
-import { Room } from "./classes/RoomClass.jsx"
+
+import { Room } from "./classes/RoomClass.js"
 
 app.use(cors())
 app.options('*', cors())
@@ -58,7 +59,9 @@ const rooms = {}
 const allRoomUsers = {}
 
 
-
+const deleteRoom = (roomName) => { 
+  delete rooms[roomName];
+}
 
 io.on("connection", (socket) => {
   console.log("a user connected")
@@ -66,50 +69,44 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     let roomName = allRoomUsers[socket.id];
     let pomodeeRoom = rooms[roomName];
-    pomodeeRoom.removeUser(socket.id)
+    pomodeeRoom && pomodeeRoom.removeUser(socket.id)
     console.log("disconnected")
   });
 
   socket.on("join room", (user) => {
-
     if (user.roomName) {
+
       socket.join(user.roomName)
-      const pomodeeRoom = rooms[user.roomName] || new Room(socket);
+      const pomodeeRoom = rooms[user.roomName] || new Room(socket, io, deleteRoom);
+
       pomodeeRoom.setRoomName(user.roomName);
       allRoomUsers[socket.id] = user.roomName;
-      
       if (pomodeeRoom.getRoomName() === user.roomName) {
-        pomodeeRoom.setJoiningUsers(user);
-        setTimeout(() => {
-          // in case the user list update is not reflected in the client
-          pomodeeRoom.sendSignalsToAllUsers();
-        }, 2000)
+        pomodeeRoom.setJoiningUsers({...user, id: socket.id});
       }
-       
-      console.log(
-        `${user.username} has joined the ${user.roomName} room`,
-        users.length
-      )
+
+      rooms[user.roomName] = pomodeeRoom;
+      console.log(`${user.username} has joined the ${user.roomName} room`);
     }
   });
 
 
-  socket.on("action", ({ msg, roomName }) => {
+  socket.on("action", ({action, roomName}) => {
     let pomodeeRoom = rooms[roomName];
-    
-    if (msg === 'pause') {
+
+    if (action === 'pause') {
       pomodeeRoom.pause();
     }
 
-    if (msg === 'play') {
+    if (action === 'play') {
       pomodeeRoom.play();
     }
 
-    if (msg === 'stop') {
-      pomodeeRoom.close();
+    if (action === 'stop') {
+      pomodeeRoom.closeRoom();
     }
 
-    if (msg === 'reset') {
+    if (action === 'reset') {
       pomodeeRoom.reset();
     }
   });

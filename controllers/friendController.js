@@ -5,7 +5,7 @@ import { ObjectId } from 'mongodb';
 const searchUsers = async (req, res) => {
     const { user } = req.query;
 
-    const regex = new RegExp(`^${user}.*$`, 'g');
+    const regex = new RegExp(`^${user}.*$`, 'i');
 
     User.find({username:  { $regex:  regex}}).exec((error, result) => {
         if (error) {
