@@ -9,12 +9,15 @@ const createRequest = async (req, res) => {
         throw new Error("Please provide sendersEmail, sendersId, userId, username, requestType.")
     }
     
-    Request.find({sendersEmail, sendersId, sendersEmail, username, requestType }).exec((error, result) => {
-    if (error) {
-        throw new Error(error)
-    } else {
+    await Request.find({ sendersEmail, sendersId, sendersEmail, username, requestType }).exec((error, result) => {
+        if (error) {
+            throw new Error(error)
+        } else {
 
-        if (result.length > 0) res.status(StatusCodes.CREATED).json({ message: 'Request was created successfully', data: result });
+            if (result.length > 0) {
+                res.status(StatusCodes.CREATED).json({ message: 'Request was created successfully', data: result });
+                return
+            }
         
             const request = new Request({ sendersEmail, sendersId, roomName, userId, username, requestType, createdAt: new Date() });
 
@@ -25,8 +28,8 @@ const createRequest = async (req, res) => {
                     res.status(StatusCodes.CREATED).json({ message: 'Request was created successfully' , data: request});
                 }
             })
-    }
-    })
+            }
+        });
 };
 
 const getRequestByUserId = async (req, res) => {
