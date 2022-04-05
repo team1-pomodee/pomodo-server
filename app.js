@@ -118,7 +118,7 @@ io.on("connection", (socket) => {
 
   socket.on("logout", ({ roomName }) => {
     let pomodeeRoom = rooms[roomName];
-    console.log("i receive", pomodeeRoom, roomName)
+    console.log("i receive", roomName)
     pomodeeRoom.logout(roomName)
   })
 

@@ -14,6 +14,7 @@ export class Room  {
   isPlaying = false;
   percent = 100;
   deleteRoom;
+  intervalIDList = [];
   
   constructor(socket, io, deleteRoom){
     this.socket = socket;
@@ -41,11 +42,14 @@ export class Room  {
       this.sendSignalsToSingleUser('timer',  {isPlaying: this.isPlaying, onlineUsers: this.onlineUsers.length, cycle: this.cycle, percent: this.percent, time: this.counter / this.intervalDuration , duration: this.duration});
 
     }, this.intervalDuration);
+
+    this.intervalIDList.push(this.intervalID);
   }
 
   pause = () => {
     this.isPlaying = false;
     clearInterval(this.intervalID);
+    this.intervalIDList.map((id) => {clearInterval(id)});
     this.sendSignalsToSingleUser('timer',  {isPlaying: this.isPlaying, onlineUsers: this.onlineUsers.length, cycle: this.cycle, percent: this.percent, time: this.counter / this.intervalDuration , duration: this.duration});
   }
 
@@ -53,7 +57,6 @@ export class Room  {
     this.pause()
     this.isPlaying = false;
      
-    this.intervalID = null;
     this.counter = 0;
     this.breakDuration = 5000;
     this.pomodoDuration = 25000;
@@ -62,6 +65,7 @@ export class Room  {
     this.cycle = 0;
     this.isPlaying = false;
     this.percent = 0;
+    this.intervalID = null;
 
     clearInterval();
     this.sendSignalsToSingleUser('timer',  {isPlaying: this.isPlaying, onlineUsers:this.onlineUsers.length, cycle: this.cycle, percent: 100, time: this.counter / this.intervalDuration , duration: this.duration});
