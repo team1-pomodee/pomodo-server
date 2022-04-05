@@ -21,8 +21,8 @@ export class Room  {
     this.deleteRoom = deleteRoom;
   }
 
-  play = () => { 
-
+  play = () => {
+    
     this.intervalID = setInterval(() => {
       this.isPlaying = true;
       if (this.counter === this.duration) {
@@ -32,13 +32,13 @@ export class Room  {
 
         this.percent = Math.floor(this.counter / this.duration * 100);
 
-        this.sendSignalsToAllUser('timer',  {isPlaying: this.isPlaying, onlineUsers:this.onlineUsers.length, cycle: this.cycle, percent: this.percent, time: this.counter / this.intervalDuration, duration: this.duration});
+        this.sendSignalsToSingleUser('timer',  {isPlaying: this.isPlaying, onlineUsers:this.onlineUsers.length, cycle: this.cycle, percent: this.percent, time: this.counter / this.intervalDuration, duration: this.duration});
         return
       }
 
       this.counter =  this.counter + this.intervalDuration;
       this.percent = Math.floor(this.counter / this.duration * 100)
-      this.sendSignalsToAllUser('timer',  {isPlaying: this.isPlaying, onlineUsers: this.onlineUsers.length, cycle: this.cycle, percent: this.percent, time: this.counter / this.intervalDuration , duration: this.duration});
+      this.sendSignalsToSingleUser('timer',  {isPlaying: this.isPlaying, onlineUsers: this.onlineUsers.length, cycle: this.cycle, percent: this.percent, time: this.counter / this.intervalDuration , duration: this.duration});
 
     }, this.intervalDuration);
   }
@@ -46,7 +46,7 @@ export class Room  {
   pause = () => {
     this.isPlaying = false;
     clearInterval(this.intervalID);
-    this.sendSignalsToAllUser('timer',  {isPlaying: this.isPlaying, onlineUsers: this.onlineUsers.length, cycle: this.cycle, percent: this.percent, time: this.counter / this.intervalDuration , duration: this.duration});
+    this.sendSignalsToSingleUser('timer',  {isPlaying: this.isPlaying, onlineUsers: this.onlineUsers.length, cycle: this.cycle, percent: this.percent, time: this.counter / this.intervalDuration , duration: this.duration});
   }
 
   reset = () => { 
@@ -63,8 +63,8 @@ export class Room  {
     this.isPlaying = false;
     this.percent = 0;
 
-    clearInterval(this.intervalID);
-    this.sendSignalsToAllUser('timer',  {isPlaying: this.isPlaying, onlineUsers:this.onlineUsers.length, cycle: this.cycle, percent: 100, time: this.counter / this.intervalDuration , duration: this.duration});
+    clearInterval();
+    this.sendSignalsToSingleUser('timer',  {isPlaying: this.isPlaying, onlineUsers:this.onlineUsers.length, cycle: this.cycle, percent: 100, time: this.counter / this.intervalDuration , duration: this.duration});
   }
 
 
@@ -72,7 +72,7 @@ export class Room  {
   closeRoom = async () => { 
     // kick all users out of the room except the creator
     
-    await this.sendSignalsToAllUser("new user", []);
+    await this.sendSignalsToSingleUser("new user", []);
     
     this.onlineUsers = []
    
@@ -95,7 +95,7 @@ export class Room  {
     });
 
     this.onlineUsers = onlineUsers;
-    this.sendSignalsToAllUser("new user", this.onlineUsers)
+    this.sendSignalsToSingleUser("new user", this.onlineUsers)
   }
 
   removeUser = (userSocketId) => {
@@ -112,8 +112,7 @@ export class Room  {
     }
   }
 
-
-  setJoiningUsers = (user) => { 
+  setJoiningUsers = (user) => {
     const onlineUser = this.onlineUsers.find((data) => data.username === user.username)
 
     if (!onlineUser) {
@@ -127,27 +126,27 @@ export class Room  {
 
     setTimeout(() => {
       // in case the user list update is not reflected in the client
-      this.sendSignalsToAllUser("new user", this.onlineUsers);
-      this.sendSignalsToAllUser('timer',  {isPlaying: this.isPlaying, cycle: this.cycle, percent: this.percent, onlineUsers:this.onlineUsers.length, time: this.counter / this.intervalDuration , duration: this.duration});
+      this.sendSignalsToSingleUser("new user", this.onlineUsers);
+      this.sendSignalsToSingleUser('timer',  {isPlaying: this.isPlaying, cycle: this.cycle, percent: this.percent, onlineUsers:this.onlineUsers.length, time: this.counter / this.intervalDuration , duration: this.duration});
     }, 2000)
      
   }
 
-
-  sendSignalsToAllUser = async (signalName, data) => { 
-       this.io.to(this.roomName).emit(signalName, data)
-  }
-
-  sendSignalsToSingleUser = async (signalName, {data, username}) => { 
+  sendSignalsToSingleUser = async (signalName, data) => { 
+    //todo: move this to sendSignalsToAllUser
     this.onlineUsers.forEach((user) => {
-      if (user.username === username) {
-        this.io.to(this.roomName).emit(signalName, data)
-      }
+        this.io.to(user.id).emit(signalName, data)
     })
   }
 
   getRoomName = () => {
     return this.roomName;
+  }
+
+  logout = (roomName) => { 
+    this.closeRoom();
+    this.deleteRoom(roomName);
+    console.log(`${roomName} has been deleted`);
   }
 
 }

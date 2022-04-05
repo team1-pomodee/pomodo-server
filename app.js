@@ -116,6 +116,12 @@ io.on("connection", (socket) => {
     pomodeeRoom.setAdmin(user);
   })
 
+  socket.on("logout", ({ roomName }) => {
+    let pomodeeRoom = rooms[roomName];
+    console.log("i receive", pomodeeRoom, roomName)
+    pomodeeRoom.logout(roomName)
+  })
+
 })
 
 
