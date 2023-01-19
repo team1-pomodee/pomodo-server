@@ -1,11 +1,9 @@
 # pomodo-server. 
 create .env file in the source, and copy then paste the following information:    
 
-PORT=5000.  
-MONGO_URL=mongodb+srv://wing:123ABC@pomodee.70xv2.mongodb.net/myFirstDatabase?retryWrites=true&w=1.
-JWT_SECRET=team-1.   
-JWT_LIFETIME=30d. 
-NODE_ENV=development
+PORT=5000.
+MONGO_URL=mongodb+srv://singhsimer09:yyXuWPEIaQx9HVLp@cluster0.n1eczbu.mongodb.net/pomodee?retryWrites=true&w=majority
+JWT_LIFETIME=30d. NODE_ENV=development
 
 ## Note
 please use import or it will not work. Ex: const express = require('express') -> import express from 'express'
